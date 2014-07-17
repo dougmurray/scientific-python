@@ -1,4 +1,4 @@
 scientific-python
 =================
 
-Repos for general scientific python scripts
+Repo for general scientific python scripts.  Testing purposes.
