@@ -19,6 +19,8 @@
        -_-    -_-
 """
 import numpy as np
+import matplotlib.pyplot as pl
+from scipy import signal
 
 def interface():
     """Runs general interface/welcome screen
@@ -105,6 +107,41 @@ def component_transfer_function(r1, r3, r4, c2, c5):
     print("Cutoff frequency: ", f0, " Hz")
     print("Damping ratio: ", alpha, " arb.")
 
+# This section is merely to test how to evaluate the transfer function
+def transfer_function(r1, r3, r4, c2, c5):
+    """Calculates the H(s) = VO / VIN of the multiple feedback low pass filter
+
+    Args:
+        r1, r3, r4: resistors in filter, Ohms
+        c2, c5: capacitors in filter, uF
+    Returns:
+        H_transfer: Array with transfer function values from 0.1 to 100k Hz
+    """
+    # Convert to uF
+    realC2 = c2 * 1.0e-6
+    realC5 = c5 * 1.0e-6
+    H = 1.0 # circuit gain at passband, default 1 (unity)
+    s = np.linspace(1, 50, 20) # 0.1 to 100k Hz
+    H_transfer = np.array([])
+    for i, element in enumerate(s):
+        num = (-H * (1.0 / r3 * r4 * c2 * c5))
+        dem = (np.square(element) + (element * (1.0 / c2) * ((1.0/r1) + (1.0/r3) + (1.0/r4))) + (1.0 / (r3 * r4 * c2 * c5)))
+
+        H_s = (-H * (1.0 / r3 * r4 * c2 * c5)) / (np.square(element) + (element * (1.0 / c2) * ((1.0/r1) + (1.0/r3) + (1.0/r4))) + (1.0 / (r3 * r4 * c2 * c5)))
+        H_transfer = np.append(H_transfer, H_s)
+    return H_transfer, num, dem
+
 if __name__ == '__main__':
-    while(1):
-        interface()
+    # while(1):
+        # interface()
+    example, numerator, denominator = transfer_function(1000, 500, 1000, 33, 4.7)
+    print(example)
+
+    x = np.linspace(1, 50, 20)
+    pl.plot(x, example, 'o')
+    pl.show()
+
+    w, h = signal.freqz(numerator, denominator)
+    pl.plot(w, 20 * np.log10(abs(h)), 'b')
+    pl.grid()
+    pl.show()
