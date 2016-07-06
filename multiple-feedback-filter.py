@@ -122,16 +122,21 @@ def transfer_function(r1, r3, r4, c2, c5):
     realC5 = c5 * 1.0e-6
     H = 1.0 # circuit gain at passband, default 1 (unity)
     s = np.linspace(1, 50, 20) # 0.1 to 100k Hz
+    nums = np.array([])
+    denoms = np.array([])
     H_transfer = np.array([])
+
     for i, element in enumerate(s):
         # Numerator and denominator of multiple feedback low pass transfer
         num = (-H * (1.0 / r3 * r4 * c2 * c5))
-        dem = (np.square(element) + (element * (1.0 / c2) * ((1.0/r1) + (1.0/r3) + (1.0/r4))) + (1.0 / (r3 * r4 * c2 * c5)))
+        dom = (np.square(element) + (element * (1.0 / c2) * ((1.0/r1) + (1.0/r3) + (1.0/r4))) + (1.0 / (r3 * r4 * c2 * c5)))
 
         # The transfer function of a multiple feedback low pass filter
         H_s = (-H * (1.0 / r3 * r4 * c2 * c5)) / (np.square(element) + (element * (1.0 / c2) * ((1.0/r1) + (1.0/r3) + (1.0/r4))) + (1.0 / (r3 * r4 * c2 * c5)))
+        nums = np.append(nums, num)
+        denoms = np.append(denoms, dom)
         H_transfer = np.append(H_transfer, H_s)
-    return H_transfer, num, dem
+    return H_transfer, nums, denoms
 
 if __name__ == '__main__':
     # while(1):
